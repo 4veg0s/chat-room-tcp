@@ -47,6 +47,7 @@ public class Server implements Runnable {
     public void shutdown() {
         try {
             done = true;
+            pool.shutdown();
             if (!server.isClosed()) {
                 server.close();
             }
@@ -79,7 +80,7 @@ public class Server implements Runnable {
                 broadcast(nickname + " joined the chat!");
                 String message;
                 while ((message = in.readLine()) != null) {
-                    if (message.startsWith("/nick ")) {
+                    if (message.startsWith("/nick")) {
                         String[] messageSplit = message.split(" ", 2);
                         if (messageSplit.length == 2) {
                             broadcast(nickname + " renamed themselves to " + messageSplit[1]);
@@ -89,8 +90,9 @@ public class Server implements Runnable {
                         } else {
                             out.println("No nickname provided");
                         }
-                    } else if (message.startsWith("/quit ")) {
+                    } else if (message.startsWith("/quit")) {
                         broadcast(nickname + " left the chat");
+                        System.out.println(nickname + " disconnected");
                         shutdown();
                     } else {
                         broadcast(nickname + ": " + message);
